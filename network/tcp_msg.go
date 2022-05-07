@@ -3,6 +3,7 @@ package network
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"math"
 )
@@ -70,6 +71,7 @@ func (p *MsgParser) Read(conn *TCPConn) ([]byte, error) {
 
 	// read len
 	if _, err := io.ReadFull(conn, bufMsgLen); err != nil {
+		fmt.Println("MsgParser read: ", bufMsgLen, err)
 		return nil, err
 	}
 
@@ -98,7 +100,7 @@ func (p *MsgParser) Read(conn *TCPConn) ([]byte, error) {
 	} else if msgLen < p.minMsgLen {
 		return nil, errors.New("message too short")
 	}
-	
+
 	// data
 	msgData := p.MakeByteSlice(int(msgLen))
 	if _, err := io.ReadFull(conn, msgData[:msgLen]); err != nil {
@@ -125,7 +127,7 @@ func (p *MsgParser) Write(conn *TCPConn, args ...[]byte) error {
 	}
 
 	//msg := make([]byte, uint32(p.lenMsgLen)+msgLen)
-	msg := p.MakeByteSlice(p.lenMsgLen+int(msgLen))
+	msg := p.MakeByteSlice(p.lenMsgLen + int(msgLen))
 	// write len
 	switch p.lenMsgLen {
 	case 1:

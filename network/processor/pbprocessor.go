@@ -3,9 +3,10 @@ package processor
 import (
 	"encoding/binary"
 	"fmt"
+	"reflect"
+
 	"github.com/duanhf2012/origin/network"
 	"github.com/gogo/protobuf/proto"
-	"reflect"
 )
 
 type MessageInfo struct {

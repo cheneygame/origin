@@ -2,10 +2,12 @@ package network
 
 import (
 	"errors"
-	"github.com/duanhf2012/origin/log"
-	"github.com/gorilla/websocket"
 	"net"
 	"sync"
+	"time"
+
+	"github.com/duanhf2012/origin/log"
+	"github.com/gorilla/websocket"
 )
 
 type WebsocketConnSet map[*websocket.Conn]struct{}
@@ -16,6 +18,10 @@ type WSConn struct {
 	writeChan chan []byte
 	maxMsgLen uint32
 	closeFlag bool
+}
+
+func (wsConn *WSConn) GetConn() *websocket.Conn {
+	return wsConn.conn
 }
 
 func newWSConn(conn *websocket.Conn, pendingWriteNum int, maxMsgLen uint32) *WSConn {
@@ -134,4 +140,12 @@ func (wsConn *WSConn) WriteMsg(args ...[]byte) error {
 
 	wsConn.doWrite(msg)
 	return nil
+}
+
+func (wsConn *WSConn) SetReadDeadline(d time.Duration) {
+	wsConn.conn.SetReadDeadline(time.Now().Add(d))
+}
+
+func (wsConn *WSConn) SetWriteDeadline(d time.Duration) {
+	wsConn.conn.SetWriteDeadline(time.Now().Add(d))
 }
