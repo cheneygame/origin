@@ -133,15 +133,16 @@ func (ws *WSService) NewWSClient(conn *network.WSConn) network.Agent {
 
 	for {
 		ws.initClientId += 1
-		//clientId := ws.mapClient.genId(ws.initClientId)
-		_, ok := ws.mapClient[ws.initClientId]
+		//clientId := ws.initClientId
+		clientId := ws.genId() //ssm
+		_, ok := ws.mapClient[clientId]
 		if ok == true {
 			continue
 		}
 
-		pClient := &WSClient{wsConn: conn, id: ws.initClientId}
+		pClient := &WSClient{wsConn: conn, id: clientId}
 		pClient.wsService = ws
-		ws.mapClient[ws.initClientId] = pClient
+		ws.mapClient[clientId] = pClient
 		return pClient
 	}
 
