@@ -1,10 +1,11 @@
 package network
 
 import (
-	"github.com/duanhf2012/origin/log"
-	"github.com/gorilla/websocket"
 	"sync"
 	"time"
+
+	"github.com/duanhf2012/origin/log"
+	"github.com/gorilla/websocket"
 )
 
 type WSClient struct {
@@ -13,7 +14,6 @@ type WSClient struct {
 	ConnNum          int
 	ConnectInterval  time.Duration
 	PendingWriteNum  int
-	MaxMsgLen        uint32
 	HandshakeTimeout time.Duration
 	AutoReconnect    bool
 	NewAgent         func(*WSConn) Agent
@@ -21,6 +21,13 @@ type WSClient struct {
 	cons             WebsocketConnSet
 	wg               sync.WaitGroup
 	closeFlag        bool
+	//
+	// msg parser //todo
+	LenMsgLen    int
+	MinMsgLen    uint32
+	MaxMsgLen    uint32
+	LittleEndian bool
+	msgParser    *MsgParser
 }
 
 func (client *WSClient) Start() {
@@ -77,7 +84,7 @@ func (client *WSClient) dial() *websocket.Conn {
 			return conn
 		}
 
-		log.SRelease("connect to ", client.Addr," error: ", err.Error())
+		log.SRelease("connect to ", client.Addr, " error: ", err.Error())
 		time.Sleep(client.ConnectInterval)
 		continue
 	}
@@ -119,7 +126,7 @@ reconnect:
 	}
 }
 
-func (client *WSClient) Close() {
+func (client *WSClient) Close(waitDone bool) {
 	client.Lock()
 	client.closeFlag = true
 	for conn := range client.cons {
@@ -128,5 +135,7 @@ func (client *WSClient) Close() {
 	client.cons = nil
 	client.Unlock()
 
-	client.wg.Wait()
+	if waitDone == true {
+		client.wg.Wait()
+	}
 }

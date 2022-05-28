@@ -36,6 +36,9 @@ const Default_WS_MaxConnNum = 3000
 const Default_WS_PendingWriteNum = 10000
 const Default_WS_MaxMsgLen = 65535
 
+const Sec_ReadDeadLine = 60
+const Sec_WriteDeadLine = 60
+
 type WSClient struct {
 	id        uint64
 	wsConn    *network.WSConn
@@ -160,8 +163,7 @@ func (slf *WSClient) GetId() uint64 {
 func (slf *WSClient) Read() {
 	slf.wsService.NotifyEvent(&event.Event{Type: event.Sys_Event_WebSocket, Data: &WSPack{ClientId: slf.id, Type: WPT_Connected, MsgProcessor: slf.wsService.process}})
 	for {
-		slf.wsConn.SetReadDeadline(time.Second * 60)  //ssm
-		slf.wsConn.SetWriteDeadline(time.Second * 60) //ssm
+		slf.wsConn.SetReadDeadline(time.Second * Sec_ReadDeadLine) //ssm
 		bytes, err := slf.wsConn.ReadMsg()
 		if err != nil {
 			log.Debug("read client id %d is error:%+v", slf.id, err)
@@ -200,7 +202,7 @@ func (ws *WSService) SendMsg(clientid uint64, msg interface{}) error {
 	if err != nil {
 		return err
 	}
-	client.wsConn.SetWriteDeadline(time.Second * 60) //ssm
+	client.wsConn.SetWriteDeadline(time.Second * Sec_WriteDeadLine) //ssm
 	return client.wsConn.WriteMsg(bytes)
 }
 
