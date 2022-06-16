@@ -2,7 +2,6 @@ package network
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"sync"
 	"time"
@@ -145,7 +144,6 @@ func (wsConn *WSConn) WriteMsg(args ...[]byte) error {
 
 func (wsConn *WSConn) SetReadDeadline(d time.Duration) {
 	wsConn.conn.SetReadDeadline(time.Now().Add(d))
-	fmt.Println("SetReadDeadline:", time.Now().Add(d))
 }
 
 func (wsConn *WSConn) SetWriteDeadline(d time.Duration) {
