@@ -6,7 +6,8 @@ import (
 	"reflect"
 
 	"github.com/duanhf2012/origin/network"
-	"github.com/gogo/protobuf/proto"
+	//"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 type MessageInfo struct {
